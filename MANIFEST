@@ -25,3 +25,4 @@ eg/Test/t/002_index_route.t
 eg/Test/views/index.tt
 eg/Test/views/layouts/main.tt
 lib/Dancer/Plugin/DBIC.pm
+logs/development.log

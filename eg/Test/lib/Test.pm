@@ -8,9 +8,12 @@ our $VERSION = '0.1';
 
 get '/' => sub {
     
-    print Dumper foo->resultset('User')->all;
+    foo();
     
-    exit;
+    my $this;
+    $this = foo() for (1..4);
+    
+    die Dumper $this;
 };
 
 true;

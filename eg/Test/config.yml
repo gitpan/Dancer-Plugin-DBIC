@@ -3,6 +3,6 @@ logger: "file"
 plugins:
   DBIC:
     foo:
-      dsn:  "dbi:mysql:_development_atoms6"
+      dsn:  "dbi:mysql:foo"
       user: root
-      pckg: Test
+      pckg: Foo::Bar
