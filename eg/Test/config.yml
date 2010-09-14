@@ -1,8 +1,0 @@
-layout: "main"
-logger: "file"
-plugins:
-  DBIC:
-    foo:
-      dsn:  "dbi:mysql:foo"
-      user: root
-      pckg: Foo::Bar

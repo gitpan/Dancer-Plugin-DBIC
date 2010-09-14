@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     'DBIx::Class' => '0',
     'DBIx::Class::Schema::Loader' => '0'
   },
-  'VERSION' => '0.10',
+  'VERSION' => '0.11',
   'test' => {
     'TESTS' => ''
   }
