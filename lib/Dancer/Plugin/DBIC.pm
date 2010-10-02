@@ -2,7 +2,7 @@
 
 package Dancer::Plugin::DBIC;
 BEGIN {
-  $Dancer::Plugin::DBIC::VERSION = '0.11';
+  $Dancer::Plugin::DBIC::VERSION = '0.12';
 }
 
 use strict;
@@ -29,7 +29,7 @@ foreach my $keyword (keys %{ $cfg }) {
             $cfg->{$keyword}->{pckg},
             {},
             [ @dsn ],
-        ) unless $cfg->{skip_automake};
+        ) if $cfg->{$keyword}->{generate} == 1;
         
         push @dsn, $cfg->{$keyword}->{options}  if $cfg->{$keyword}->{options};
         
@@ -59,7 +59,7 @@ Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -75,11 +75,13 @@ version 0.11
             RaiseError: 1
             PrintError: 1
     
-    # Note! If your app already has a DBIC schema you may turn off auto generation like so..
+    # Important Note! We have reversed our policy so that D::P::DBIC will not
+    # assume to automatically generate your DBIx-Class Classes, to enable DBIx-Class
+    # generation, please use the following configuration
     plugins:
       DBIC:
         foo:
-          skip_automake: 1
+          generate: 1
     
     # Dancer Code File
     use Dancer;
