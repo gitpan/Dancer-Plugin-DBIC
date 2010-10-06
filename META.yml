@@ -1,12 +1,13 @@
 ---
-abstract: 'DBIx::Class interface for Dancer applications'
+abstract: 'DBIx-Class interface for Dancer applications'
 author:
   - 'Al Newkirk <awncorp@cpan.org>'
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
 build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: 6.31
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101670'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,4 +16,4 @@ name: Dancer-Plugin-DBIC
 requires:
   DBIx::Class: 0
   DBIx::Class::Schema::Loader: 0
-version: 0.12
+version: 0.13

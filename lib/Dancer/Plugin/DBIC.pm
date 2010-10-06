@@ -1,65 +1,21 @@
-# ABSTRACT: DBIx::Class interface for Dancer applications
+# ABSTRACT: DBIx-Class interface for Dancer applications
 
 package Dancer::Plugin::DBIC;
 BEGIN {
-  $Dancer::Plugin::DBIC::VERSION = '0.12';
+  $Dancer::Plugin::DBIC::VERSION = '0.13';
+}
+BEGIN {
+  $Dancer::Plugin::DBIC::VERSION = '0.13';
 }
 
 use strict;
 use warnings;
 use Dancer::Plugin;
 use DBIx::Class;
-use DBIx::Class::Schema::Loader qw/ make_schema_at /;
+use DBIx::Class::Schema::Loader;
 
 my  $cfg = plugin_setting;
-my  $DBH = {};
-
-
-foreach my $keyword (keys %{ $cfg }) {
-    register $keyword => sub {
-        my @dsn = ();
-        
-        $cfg->{$keyword}->{pckg} =~ s/\-/::/g;
-        
-        push @dsn, $cfg->{$keyword}->{dsn}      if $cfg->{$keyword}->{dsn};
-        push @dsn, $cfg->{$keyword}->{user}     if $cfg->{$keyword}->{user};
-        push @dsn, $cfg->{$keyword}->{pass}     if $cfg->{$keyword}->{pass};
-        
-        make_schema_at(
-            $cfg->{$keyword}->{pckg},
-            {},
-            [ @dsn ],
-        ) if $cfg->{$keyword}->{generate} == 1;
-        
-        push @dsn, $cfg->{$keyword}->{options}  if $cfg->{$keyword}->{options};
-        
-        my  $variable = lc $cfg->{$keyword}->{pckg};
-            $variable =~ s/::/\-/g;
-            
-        my  $package  = $cfg->{$keyword}->{pckg};
-        
-        unless ( $Dancer::Plugin::DBIC::DBH->{$keyword}->{$variable} ) {
-            $Dancer::Plugin::DBIC::DBH->{$keyword}->{$variable} =
-            $package->connect(@dsn);
-        }
-        
-        return $Dancer::Plugin::DBIC::DBH->{$keyword}->{$variable};
-    };
-}
-
-register_plugin;
-
-1;
-__END__
-=pod
-
-=head1 NAME
-
-Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
-
-=head1 VERSION
-
-version 0.12
+my  $schemas = {};
 
 =head1 SYNOPSIS
 
@@ -67,36 +23,25 @@ version 0.12
     plugins:
       DBIC:
         foo:
-          pckg: "Foo::Bar"
           dsn:  "dbi:mysql:db_foo"
           user: "root"
           pass: "****"
           options:
             RaiseError: 1
             PrintError: 1
-    
-    # Important Note! We have reversed our policy so that D::P::DBIC will not
-    # assume to automatically generate your DBIx-Class Classes, to enable DBIx-Class
-    # generation, please use the following configuration
-    plugins:
-      DBIC:
-        foo:
-          generate: 1
+        bar:
+          dsn:  "dbi:SQLite:dbname=./foo.db"
     
     # Dancer Code File
     use Dancer;
     use Dancer::Plugin::DBIC;
 
-    # Calling the `foo` dsn keyword will return a L<DBIx::Class> instance using
-    # the database connection specifications associated with the dsn keyword
-    # within the Dancer configuration file.
+    # Calling foo will return a L<DBIx::Class::Schema> instance using
+    # the database connection info from the configuration file.
     
     get '/profile/:id' => sub {
-        my $users_rs = foo->resultset('Users')->search({
-            user_id => params->{id}
-        });
-        
-        template 'user_profile', { user_data => $user_rs->next };
+        my $user = foo->resultset('Users')->find(params->{id});
+        template user_profile => { user => $user };
     };
 
     dance;
@@ -106,9 +51,9 @@ below.
 
 =head1 DESCRIPTION
 
-Provides an easy way to obtain a DBIx::Class instance by simply calling a dsn keyword
-you define within your Dancer configuration file, this allows your L<Dancer>
-application to connect to one or many databases with ease and consistency.
+Provides an easy way to obtain DBIx::Class::ResultSet instances.
+You just need to point to a dsn in your L<Dancer> configuration file.
+So you no longer have to write boilerplate DBIC setup code.
 
 =head1 CONFIGURATION
 
@@ -118,7 +63,7 @@ should be specified as stated above, for example:
     plugins:
       DBIC:
         foo:
-          pckg: "Foo"
+          schema_class: "Foo::Bar"
           dsn:  "dbi:mysql:db_foo"
           user: "root"
           pass: "****"
@@ -126,29 +71,65 @@ should be specified as stated above, for example:
             RaiseError: 1
             PrintError: 1
         bar:
-          pckg: "Bar"
           dsn:  "dbi:SQLite:dbname=./foo.db"
 
-Please use dsn keywords that will not clash with existing L<Dancer> and
-Dancer::Plugin::*** reserved keywords. 
+Make sure that the options immediately under DBIC
+(foo and bar in the above example)
+do not clash with existing L<Dancer> and Dancer::Plugin::*** reserved keywords. 
 
-Each database configuration *must* have a dsn and pckg option. The dsn option
-should be the L<DBI> driver connection string less the optional user/pass and
-arguments options. The pckg option should be a proper Perl package name that
-Dancer::Plugin::DBIC will use as a DBIx::Class schema class. Optionally a database
-configuation may have user, pass and options paramters which are appended to the
-dsn in list form, i.e. dbi:SQLite:dbname=./foo.db, $user, $pass, $options.
+Each database configuration *must* have a dsn option.
+The dsn option should be the L<DBI> driver connection string.
 
-=head1 AUTHOR
+If a schema_class option is not provided, then L<DBIx::Class::Schema::Loader>
+will be used to auto load the schema.
 
-Al Newkirk <awncorp@cpan.org>
+The schema_class option, if provided, should be a proper Perl package name that
+Dancer::Plugin::DBIC will use as a DBIx::Class::Schema class.
+Optionally, a database configuation may have user, pass and options paramters
+which are appended to the dsn in list form,
+i.e. dbi:SQLite:dbname=./foo.db, $user, $pass, $options.
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2010 by awncorp.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+    # Note! You can also declare your connection information with the
+    # following syntax:
+    plugings:
+      DBIC:
+        foo:
+          connect_info:
+            - dbi:mysql:db_foo
+            - root
+            - ***
+            -
+              RaiseError: 1
+              PrintError: 1
 
 =cut
 
+foreach my $keyword (keys %{ $cfg }) {
+    register $keyword => sub {
+        return $schemas->{$keyword} if $schemas->{$keyword};
+        
+        my @dsn = $cfg->{$keyword}->{connect_info}
+            ? @{$cfg->{$keyword}{connect_info}}
+            : @{$cfg->{$keyword}}{qw(dsn user pass options)};
+
+        my $schema_class = $cfg->{$keyword}{schema_class}
+            || $cfg->{$keyword}{pckg}; # pckg should be deprecated
+
+        if ($schema_class) {
+            $schema_class =~ s/-/::/g;
+            eval "use $schema_class";
+            if ( my $err = $@ ) {
+                die "error while loading $schema_class : $err";
+            }
+            $schemas->{$keyword} = $schema_class->connect(@dsn)
+        } else {
+            $schemas->{$keyword} = DBIx::Class::Schema::Loader->connect(@dsn);
+        }
+        
+        return $schemas->{$keyword};
+    };
+}
+
+register_plugin;
+
+1;
