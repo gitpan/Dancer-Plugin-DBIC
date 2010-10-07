@@ -1,5 +1,5 @@
 ---
-abstract: 'DBIx-Class interface for Dancer applications'
+abstract: 'DBIx::Class interface for Dancer applications'
 author:
   - 'Al Newkirk <awncorp@cpan.org>'
   - 'Naveed Massjouni <naveedm9@gmail.com>'
@@ -16,4 +16,4 @@ name: Dancer-Plugin-DBIC
 requires:
   DBIx::Class: 0
   DBIx::Class::Schema::Loader: 0
-version: 0.13
+version: 0.14

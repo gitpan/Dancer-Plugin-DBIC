@@ -1,11 +1,11 @@
-# ABSTRACT: DBIx-Class interface for Dancer applications
+# ABSTRACT: DBIx::Class interface for Dancer applications
 
 package Dancer::Plugin::DBIC;
 BEGIN {
-  $Dancer::Plugin::DBIC::VERSION = '0.13';
+  $Dancer::Plugin::DBIC::VERSION = '0.14';
 }
 BEGIN {
-  $Dancer::Plugin::DBIC::VERSION = '0.13';
+  $Dancer::Plugin::DBIC::VERSION = '0.14';
 }
 
 use strict;
@@ -17,26 +17,68 @@ use DBIx::Class::Schema::Loader;
 my  $cfg = plugin_setting;
 my  $schemas = {};
 
+
+foreach my $keyword (keys %{ $cfg }) {
+    register $keyword => sub {
+        return $schemas->{$keyword} if $schemas->{$keyword};
+        
+        my @dsn = $cfg->{$keyword}->{connect_info}
+            ? @{$cfg->{$keyword}{connect_info}}
+            : @{$cfg->{$keyword}}{qw(dsn user pass options)};
+
+        my $schema_class = $cfg->{$keyword}{schema_class}
+            || $cfg->{$keyword}{pckg}; # pckg should be deprecated
+
+        if ($schema_class) {
+            $schema_class =~ s/-/::/g;
+            eval "use $schema_class";
+            if ( my $err = $@ ) {
+                die "error while loading $schema_class : $err";
+            }
+            $schemas->{$keyword} = $schema_class->connect(@dsn)
+        } else {
+            $schemas->{$keyword} = DBIx::Class::Schema::Loader->connect(@dsn);
+        }
+        
+        return $schemas->{$keyword};
+    };
+}
+
+register_plugin;
+
+1;
+
+__END__
+=pod
+
+=head1 NAME
+
+Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
+
+=head1 VERSION
+
+version 0.14
+
 =head1 SYNOPSIS
 
     # Dancer Configuration File
     plugins:
       DBIC:
         foo:
+          dsn:  "dbi:SQLite:dbname=./foo.db"
+        bar:
           dsn:  "dbi:mysql:db_foo"
           user: "root"
           pass: "****"
           options:
             RaiseError: 1
             PrintError: 1
-        bar:
-          dsn:  "dbi:SQLite:dbname=./foo.db"
     
     # Dancer Code File
     use Dancer;
     use Dancer::Plugin::DBIC;
 
-    # Calling foo will return a L<DBIx::Class::Schema> instance using
+    # Calling foo or bar will return a DBIx::Class::Schema instance using
     # the database connection info from the configuration file.
     
     get '/profile/:id' => sub {
@@ -102,34 +144,26 @@ i.e. dbi:SQLite:dbname=./foo.db, $user, $pass, $options.
               RaiseError: 1
               PrintError: 1
 
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Al Newkirk <awncorp@cpan.org>
+
+=item *
+
+Naveed Massjouni <naveedm9@gmail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by awncorp.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
 
-foreach my $keyword (keys %{ $cfg }) {
-    register $keyword => sub {
-        return $schemas->{$keyword} if $schemas->{$keyword};
-        
-        my @dsn = $cfg->{$keyword}->{connect_info}
-            ? @{$cfg->{$keyword}{connect_info}}
-            : @{$cfg->{$keyword}}{qw(dsn user pass options)};
-
-        my $schema_class = $cfg->{$keyword}{schema_class}
-            || $cfg->{$keyword}{pckg}; # pckg should be deprecated
-
-        if ($schema_class) {
-            $schema_class =~ s/-/::/g;
-            eval "use $schema_class";
-            if ( my $err = $@ ) {
-                die "error while loading $schema_class : $err";
-            }
-            $schemas->{$keyword} = $schema_class->connect(@dsn)
-        } else {
-            $schemas->{$keyword} = DBIx::Class::Schema::Loader->connect(@dsn);
-        }
-        
-        return $schemas->{$keyword};
-    };
-}
-
-register_plugin;
-
-1;
