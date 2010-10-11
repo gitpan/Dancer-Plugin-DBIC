@@ -3,11 +3,11 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+dbic.kpf
 dist.ini
 lib/Dancer/Plugin/DBIC.pm
-t/01-basic.t
-t/02-dbic-classes.t
+t/01-single-schema.t
+t/02-multiple-schemas.t
+t/03-dbic-classes.t
 t/lib/Foo.pm
 t/lib/Foo/Result/User.pm
-t/release-pod-coverage.t
-t/release-pod-syntax.t

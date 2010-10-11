@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 7, import => ['!pass'];
+use Test::Exception;
 
 use Dancer;
-use Dancer::Test;
 use DBI;
 use DBIx::Class;
 use DBIx::Class::Schema::Loader;
@@ -55,7 +55,7 @@ BEGIN {
 
     @users = ( ['sue', 20] );
     for my $user (@users) {
-        $dbh2->do(q{ insert into user values(?,?) }, {}, @$user[0,1]);
+        $dbh2->do(q{ insert into user values(?,?) }, {}, @$user);
     }
 
 }
@@ -63,22 +63,15 @@ BEGIN {
 use lib "$RealBin/../lib";
 use Dancer::Plugin::DBIC;
 
-get '/bob' => sub {
-    my $user = foo->resultset('User')->find('bob');
-    ok $user, 'Found bob.';
-    is $user->age => '30', 'Bob is getting old.';
-};
+my $user = schema('foo')->resultset('User')->find('bob');
+ok $user, 'Found bob.';
+is $user->age => '30', 'Bob is getting old.';
 
-get '/sue' => sub {
-    my $user = bar->resultset('User')->find('sue');
-    ok $user, 'Found sue.';
-    is $user->age => '20', 'Sue is the right age.';
-};
+$user = schema('bar')->resultset('User')->find('sue');
+ok $user, 'Found sue.';
+is $user->age => '20', 'Sue is the right age.';
 
-response_exists [ get => '/bob' ], 'Route /bob ran';
-
-response_exists [ get => '/sue' ], 'Route /sue ran';
+throws_ok { schema('poo')->resultset('User')->find('bob') }
+    qr/schema poo is not configured/, 'Missing schema error thrown';
 
 unlink $dbfile1, $dbfile2;
-
-#done_testing;
