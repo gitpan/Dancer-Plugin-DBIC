@@ -6,14 +6,14 @@ author:
 build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: 6.31
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101670'
+generated_by: 'Dist::Zilla version 2.101241'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Dancer-Plugin-DBIC
+recommends: {}
 requires:
   DBIx::Class: 0
-  DBIx::Class::Schema::Loader: 0
-version: 0.15
+  DBIx::Class::Schema::Loader: 0.07002
+version: 0.1501

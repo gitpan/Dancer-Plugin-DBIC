@@ -2,7 +2,7 @@
 
 package Dancer::Plugin::DBIC;
 BEGIN {
-  $Dancer::Plugin::DBIC::VERSION = '0.15';
+  $Dancer::Plugin::DBIC::VERSION = '0.1501';
 }
 
 use strict;
@@ -18,11 +18,11 @@ my $schemas = {};
 register schema => sub {
     my $name = shift;
 
-    if (defined $name) {
-        return $schemas->{$name} if $schemas->{$name};
-    } else {
+    if (not defined $name) {
         ($name) = keys %$cfg or die "No schemas are configured";
     }
+
+    return $schemas->{$name} if $schemas->{$name};
 
     my $options = $cfg->{$name} or die "The schema $name is not configured";
 
@@ -60,14 +60,14 @@ Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.15
+version 0.1501
 
 =head1 SYNOPSIS
 
     # Dancer Code File
     use Dancer;
     use Dancer::Plugin::DBIC;
-    #use Dancer::Plugin::DBIC qw(schema); # explicit import
+    #use Dancer::Plugin::DBIC qw(schema); # explicit import if you like
 
     get '/profile/:id' => sub {
         my $user = schema->resultset('Users')->find(params->{id});
@@ -139,17 +139,8 @@ as described in the documentation for connect() in L<DBI>.
 
 =head1 AUTHORS
 
-=over 4
-
-=item *
-
-Al Newkirk <awncorp@cpan.org>
-
-=item *
-
-Naveed Massjouni <ironcamel@cpan.org>
-
-=back
+  Al Newkirk <awncorp@cpan.org>
+  Naveed Massjouni <ironcamel@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
