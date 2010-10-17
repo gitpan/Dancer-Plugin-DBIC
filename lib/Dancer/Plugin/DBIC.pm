@@ -2,7 +2,7 @@
 
 package Dancer::Plugin::DBIC;
 BEGIN {
-  $Dancer::Plugin::DBIC::VERSION = '0.1501';
+  $Dancer::Plugin::DBIC::VERSION = '0.1502';
 }
 
 use strict;
@@ -60,7 +60,7 @@ Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.1501
+version 0.1502
 
 =head1 SYNOPSIS
 
@@ -139,8 +139,17 @@ as described in the documentation for connect() in L<DBI>.
 
 =head1 AUTHORS
 
-  Al Newkirk <awncorp@cpan.org>
-  Naveed Massjouni <ironcamel@cpan.org>
+=over 4
+
+=item *
+
+Al Newkirk <awncorp@cpan.org>
+
+=item *
+
+Naveed Massjouni <ironcamel@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
