@@ -8,5 +8,7 @@ lib/Dancer/Plugin/DBIC.pm
 t/01-single-schema.t
 t/02-multiple-schemas.t
 t/03-dbic-classes.t
+t/04-testapp.t
 t/lib/Foo.pm
 t/lib/Foo/Result/User.pm
+t/lib/TestApp.pm

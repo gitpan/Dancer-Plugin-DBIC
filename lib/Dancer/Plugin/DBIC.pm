@@ -2,7 +2,7 @@
 
 package Dancer::Plugin::DBIC;
 BEGIN {
-  $Dancer::Plugin::DBIC::VERSION = '0.1502';
+  $Dancer::Plugin::DBIC::VERSION = '0.1503';
 }
 
 use strict;
@@ -10,13 +10,14 @@ use warnings;
 use Dancer::Plugin;
 use DBIx::Class;
 use DBIx::Class::Schema::Loader;
+DBIx::Class::Schema::Loader->naming('v7');
 
 
-my $cfg = plugin_setting;
 my $schemas = {};
 
 register schema => sub {
     my $name = shift;
+    my $cfg = plugin_setting;
 
     if (not defined $name) {
         ($name) = keys %$cfg or die "No schemas are configured";
@@ -60,7 +61,7 @@ Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.1502
+version 0.1503
 
 =head1 SYNOPSIS
 
@@ -137,6 +138,17 @@ as described in the documentation for connect() in L<DBI>.
               RaiseError: 1
               PrintError: 1
 
+=head1 SCHEMA GENERATION
+
+This plugin provides flexibility in defining schemas for use in your Dancer 
+applications. Schemas can be generated manually by you and defined in your 
+configuration file, or, they can be automatically and programmatically generated
+by this plugin whenever you call the `schema` keyword, or, because this plugin
+uses L<DBIx::Class::Schema::Loader> to do most of the heavy lifting, you can
+use the command-line utility dbicdump to generate physical DBIC schema class
+files in the current working directory. Note! The command-line utility is useful
+when loading schemas large enough to discourage auto-generation and manual creation.
+
 =head1 AUTHORS
 
 =over 4
@@ -148,6 +160,14 @@ Al Newkirk <awncorp@cpan.org>
 =item *
 
 Naveed Massjouni <ironcamel@cpan.org>
+
+=item *
+
+Alexis Sukrieh <sukria@sukria.net>
+
+=item *
+
+Franck Cuny <franck@lumberjaph.net>
 
 =back
 
