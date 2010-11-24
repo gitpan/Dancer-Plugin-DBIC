@@ -2,7 +2,7 @@
 
 package Dancer::Plugin::DBIC;
 BEGIN {
-  $Dancer::Plugin::DBIC::VERSION = '0.1503';
+  $Dancer::Plugin::DBIC::VERSION = '0.1504';
 }
 
 use strict;
@@ -61,7 +61,7 @@ Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.1503
+version 0.1504
 
 =head1 SYNOPSIS
 
@@ -159,7 +159,7 @@ Al Newkirk <awncorp@cpan.org>
 
 =item *
 
-Naveed Massjouni <ironcamel@cpan.org>
+Naveed Massjouni <naveed.massjouni@rackspace.com>
 
 =item *
 

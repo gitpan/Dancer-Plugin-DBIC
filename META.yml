@@ -2,7 +2,7 @@
 abstract: 'DBIx::Class interface for Dancer applications'
 author:
   - 'Al Newkirk <awncorp@cpan.org>'
-  - 'Naveed Massjouni <ironcamel@cpan.org>'
+  - 'Naveed Massjouni <naveed.massjouni@rackspace.com>'
   - 'Alexis Sukrieh <sukria@sukria.net>'
   - 'Franck Cuny <franck@lumberjaph.net>'
 build_requires: {}
@@ -19,4 +19,4 @@ requires:
   DBIx::Class: 0
   DBIx::Class::Schema::Loader: 0.07002
   Dancer: 0
-version: 0.1503
+version: 0.1504
