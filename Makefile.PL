@@ -4,29 +4,29 @@ use warnings;
 
 
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'DBIx::Class interface for Dancer applications',
-  'AUTHOR' => 'Al Newkirk <awncorp@cpan.org>, Naveed Massjouni <naveed.massjouni@rackspace.com>, Alexis Sukrieh <sukria@sukria.net>, Franck Cuny <franck@lumberjaph.net>',
-  'BUILD_REQUIRES' => {},
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31'
+  "ABSTRACT" => "DBIx::Class interface for Dancer applications",
+  "AUTHOR" => "Al Newkirk <awncorp\@cpan.org>, Naveed Massjouni <naveed.massjouni\@rackspace.com>, Alexis Sukrieh <sukria\@sukria.net>, Franck Cuny <franck\@lumberjaph.net>, David Precious <davidp\@preshweb.co.uk>",
+  "BUILD_REQUIRES" => {},
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
   },
-  'DISTNAME' => 'Dancer-Plugin-DBIC',
-  'EXE_FILES' => [],
-  'LICENSE' => 'perl',
-  'NAME' => 'Dancer::Plugin::DBIC',
-  'PREREQ_PM' => {
-    'DBIx::Class' => '0',
-    'DBIx::Class::Schema::Loader' => '0.07002',
-    'Dancer' => '0'
+  "DISTNAME" => "Dancer-Plugin-DBIC",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "Dancer::Plugin::DBIC",
+  "PREREQ_PM" => {
+    "DBIx::Class" => 0,
+    "DBIx::Class::Schema::Loader" => "0.07002",
+    "Dancer" => 0
   },
-  'VERSION' => '0.1504',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "0.1505",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 

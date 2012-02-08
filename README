@@ -1,26 +1,124 @@
-#!/usr/bin/env perl
+NAME
+    Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
-use Dancer;
-use Dancer::Plugin::DBIC;
-#use Dancer::Plugin::DBIC qw(schema); # explicit import if you like
+VERSION
+    version 0.1505
 
-get '/profile/:id' => sub {
-    my $user = schema->resultset('Users')->find(params->{id});
-    # or explicitly ask for a schema by name:
-    $user = schema('foo')->resultset('Users')->find(params->{id});
-    template user_profile => { user => $user };
-};
+SYNOPSIS
+        use Dancer;
+        use Dancer::Plugin::DBIC 'schema';
 
-dance;
+        get '/users/:id' => sub {
+            my $user = schema->resultset('User')->find(param 'id');
+            template user_profile => {
+                user => $user
+            };
+        };
 
-# Dancer Configuration File
+        dance;
 
-plugins:
-  DBIC:
-    foo:
-      dsn:  "dbi:mysql:db_foo"
-      user: "root"
-      pass: "****"
-      options:
-        RaiseError: 1
-        PrintError: 1
+DESCRIPTION
+    This plugin makes it very easy to create Dancer applications that
+    interface with databases. It automatically exports the keyword "schema"
+    which returns a DBIx::Class::Schema object. You just need to configure
+    your database connection information. For performance, schema objects
+    are cached in memory and are lazy loaded the first time they are
+    accessed.
+
+CONFIGURATION
+    Configuration can be done in your Dancer config file. This is a minimal
+    example:
+
+        plugins:
+          DBIC:
+            default:
+              dsn: dbi:SQLite:dbname=some.db
+
+    In this example, there are 2 databases configured named default and foo.
+
+        plugins:
+          DBIC:
+            default:
+              dsn: dbi:SQLite:dbname=some.db
+              schema_class: My::Schema
+            foo:
+              dsn:  dbi:mysql:foo
+              schema_class: Foo::Schema
+              user: bob
+              pass: secret
+              options:
+                RaiseError: 1
+                PrintError: 1
+
+    Each database configured must have a dsn option. The dsn option should
+    be the DBI driver connection string. All other options are optional.
+
+    If a schema_class option is not provided, then
+    DBIx::Class::Schema::Loader will be used to dynamically load the schema
+    based on the dsn value. This is for convenience only and should not be
+    used in production. See "SCHEMA GENERATION" below for caveats.
+
+    The schema_class option, should be a proper Perl package name that
+    Dancer::Plugin::DBIC will use as a DBIx::Class::Schema class.
+    Optionally, a database configuation may have user, pass, and options
+    parameters as described in the documentation for "connect()" in DBI.
+
+    You may also declare your connection information in the following format
+    (which may look more familiar to DBIC users):
+
+        plugins:
+          DBIC:
+            default:
+              connect_info:
+                - dbi:mysql:foo
+                - bob
+                - secret
+                -
+                  RaiseError: 1
+                  PrintError: 1
+
+USAGE
+    This plugin provides just the keyword "schema" which returns a
+    DBIx::Class::Schema object ready for you to use. If you have configured
+    only one database, then you can call "schema" with no arguments:
+
+        my $user = schema->resultset('User')->find('bob');
+
+    If you have configured multiple databases, then you must give "schema()"
+    the name of the database as an argument:
+
+        my $user = schema('foo')->resultset('User')->find('bob');
+
+SCHEMA GENERATION
+    This plugin provides flexibility in defining schemas for use in your
+    Dancer applications. Schemas can be generated manually by you and
+    defined in your configuration file using the "schema_class" setting as
+    illustrated above, which is the recommended approach for performance and
+    stability.
+
+    It is also possible to have schema classes automatically generated via
+    introspection (powered by DBIx::Class::Schema::Loader) if you omit the
+    "schema_class" directive; this is not encouraged for production use,
+    however.
+
+    You can, of course, use the dbicdump command-line utility provided by
+    DBIx::Class::Schema::Loader to ease the generation of your schema
+    classes.
+
+AUTHORS
+    *   Al Newkirk <awncorp@cpan.org>
+
+    *   Naveed Massjouni <naveed.massjouni@rackspace.com>
+
+    *   Alexis Sukrieh <sukria@sukria.net>
+
+    *   Franck Cuny <franck@lumberjaph.net>
+
+    *   David Precious <davidp@preshweb.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by awncorp.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

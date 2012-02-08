@@ -1,9 +1,8 @@
 # ABSTRACT: DBIx::Class interface for Dancer applications
 
 package Dancer::Plugin::DBIC;
-BEGIN {
-  $Dancer::Plugin::DBIC::VERSION = '0.1504';
-}
+
+our $VERSION = '0.1505'; # VERSION
 
 use strict;
 use warnings;
@@ -61,93 +60,113 @@ Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.1504
+version 0.1505
 
 =head1 SYNOPSIS
 
-    # Dancer Code File
     use Dancer;
-    use Dancer::Plugin::DBIC;
-    #use Dancer::Plugin::DBIC qw(schema); # explicit import if you like
+    use Dancer::Plugin::DBIC 'schema';
 
-    get '/profile/:id' => sub {
-        my $user = schema->resultset('Users')->find(params->{id});
-        # or explicitly ask for a schema by name:
-        $user = schema('foo')->resultset('Users')->find(params->{id});
-        template user_profile => { user => $user };
+    get '/users/:id' => sub {
+        my $user = schema->resultset('User')->find(param 'id');
+        template user_profile => {
+            user => $user
+        };
     };
 
     dance;
 
-    # Dancer Configuration File
-    plugins:
-      DBIC:
-        foo:
-          dsn:  "dbi:SQLite:dbname=./foo.db"
-
-Database connection details are read from your Dancer application config - see
-below.
-
 =head1 DESCRIPTION
 
-This plugin provides an easy way to obtain L<DBIx::Class::ResultSet> instances
-via the the function schema(), which it automatically imports.
-You just need to point to a dsn in your L<Dancer> configuration file.
-So you no longer have to write boilerplate DBIC setup code.
+This plugin makes it very easy to create L<Dancer> applications that interface
+with databases.
+It automatically exports the keyword C<schema> which returns a
+L<DBIx::Class::Schema> object.
+You just need to configure your database connection information.
+For performance, schema objects are cached in memory
+and are lazy loaded the first time they are accessed.
 
 =head1 CONFIGURATION
 
-Connection details will be grabbed from your L<Dancer> config file.
-For example: 
+Configuration can be done in your L<Dancer> config file.
+This is a minimal example:
 
     plugins:
       DBIC:
+        default:
+          dsn: dbi:SQLite:dbname=some.db
+
+In this example, there are 2 databases configured named default and foo.
+
+    plugins:
+      DBIC:
+        default:
+          dsn: dbi:SQLite:dbname=some.db
+          schema_class: My::Schema
         foo:
-          dsn: dbi:SQLite:dbname=./foo.db
-        bar:
-          schema_class: Foo::Bar
-          dsn:  dbi:mysql:db_foo
-          user: root
+          dsn:  dbi:mysql:foo
+          schema_class: Foo::Schema
+          user: bob
           pass: secret
           options:
             RaiseError: 1
             PrintError: 1
 
-Each schema configuration *must* have a dsn option.
+Each database configured must have a dsn option.
 The dsn option should be the L<DBI> driver connection string.
 All other options are optional.
 
 If a schema_class option is not provided, then L<DBIx::Class::Schema::Loader>
-will be used to auto load the schema based on the dsn value.
+will be used to dynamically load the schema based on the dsn value.
+This is for convenience only and should not be used in production.
+See L</"SCHEMA GENERATION"> below for caveats.
 
-The schema_class option, if provided, should be a proper Perl package name that
-Dancer::Plugin::DBIC will use as a DBIx::Class::Schema class.
-Optionally, a database configuation may have user, pass and options paramters
-as described in the documentation for connect() in L<DBI>.
+The schema_class option, should be a proper Perl package name that
+Dancer::Plugin::DBIC will use as a L<DBIx::Class::Schema> class.
+Optionally, a database configuation may have user, pass, and options parameters
+as described in the documentation for C<connect()> in L<DBI>.
 
-    # Note! You can also declare your connection information with the
-    # following syntax:
-    plugings:
+You may also declare your connection information in the following format
+(which may look more familiar to DBIC users):
+
+    plugins:
       DBIC:
-        foo:
+        default:
           connect_info:
-            - dbi:mysql:db_foo
-            - root
+            - dbi:mysql:foo
+            - bob
             - secret
             -
               RaiseError: 1
               PrintError: 1
 
+=head1 USAGE
+
+This plugin provides just the keyword C<schema> which
+returns a L<DBIx::Class::Schema> object ready for you to use.
+If you have configured only one database, then you can call C<schema> with
+no arguments:
+
+    my $user = schema->resultset('User')->find('bob');
+
+If you have configured multiple databases,
+then you must give C<schema()> the name of the database as an argument:
+
+    my $user = schema('foo')->resultset('User')->find('bob');
+
 =head1 SCHEMA GENERATION
 
 This plugin provides flexibility in defining schemas for use in your Dancer 
 applications. Schemas can be generated manually by you and defined in your 
-configuration file, or, they can be automatically and programmatically generated
-by this plugin whenever you call the `schema` keyword, or, because this plugin
-uses L<DBIx::Class::Schema::Loader> to do most of the heavy lifting, you can
-use the command-line utility dbicdump to generate physical DBIC schema class
-files in the current working directory. Note! The command-line utility is useful
-when loading schemas large enough to discourage auto-generation and manual creation.
+configuration file using the C<schema_class> setting as illustrated above, which
+is the recommended approach for performance and stability.
+
+It is also possible to have schema classes automatically generated via
+introspection (powered by L<DBIx::Class::Schema::Loader>) if you omit the
+C<schema_class> directive; this is not encouraged for production use, however.
+
+You can, of course, use the L<dbicdump> command-line utility provided by
+L<DBIx::Class::Schema::Loader> to ease the generation of your schema classes.
 
 =head1 AUTHORS
 
@@ -168,6 +187,10 @@ Alexis Sukrieh <sukria@sukria.net>
 =item *
 
 Franck Cuny <franck@lumberjaph.net>
+
+=item *
+
+David Precious <davidp@preshweb.co.uk>
 
 =back
 
