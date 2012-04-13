@@ -4,6 +4,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+README.md
 dist.ini
 lib/Dancer/Plugin/DBIC.pm
 t/01-single-schema.t

@@ -2,7 +2,7 @@ NAME
     Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 VERSION
-    version 0.1505
+    version 0.1506
 
 SYNOPSIS
         use Dancer;
@@ -27,14 +27,15 @@ DESCRIPTION
 
 CONFIGURATION
     Configuration can be done in your Dancer config file. This is a minimal
-    example:
+    example. It defines one database named "default":
 
         plugins:
           DBIC:
             default:
               dsn: dbi:SQLite:dbname=some.db
 
-    In this example, there are 2 databases configured named default and foo.
+    In this example, there are 2 databases configured named "default" and
+    "foo":
 
         plugins:
           DBIC:
@@ -52,6 +53,10 @@ CONFIGURATION
 
     Each database configured must have a dsn option. The dsn option should
     be the DBI driver connection string. All other options are optional.
+
+    If you only have one schema configured, or one of them is named
+    "default", you can call "schema" without an argument to get the only or
+    "default" schema, respectively.
 
     If a schema_class option is not provided, then
     DBIx::Class::Schema::Loader will be used to dynamically load the schema
@@ -84,31 +89,39 @@ USAGE
 
         my $user = schema->resultset('User')->find('bob');
 
-    If you have configured multiple databases, then you must give "schema()"
-    the name of the database as an argument:
+    If you have configured multiple databases, you can still call "schema"
+    with no arguments if there is a database named "default" in the
+    configuration. Otherwise, you must provide "schema()" with the name of
+    the database:
 
         my $user = schema('foo')->resultset('User')->find('bob');
 
 SCHEMA GENERATION
-    This plugin provides flexibility in defining schemas for use in your
-    Dancer applications. Schemas can be generated manually by you and
-    defined in your configuration file using the "schema_class" setting as
-    illustrated above, which is the recommended approach for performance and
-    stability.
+    There are two approaches for generating schema classes. You may generate
+    your own DBIx::Class classes by hand and set the corresponding
+    "schema_class" setting in your configuration as shown above. This is the
+    recommended approach for performance and stability.
 
     It is also possible to have schema classes automatically generated via
     introspection (powered by DBIx::Class::Schema::Loader) if you omit the
-    "schema_class" directive; this is not encouraged for production use,
-    however.
+    "schema_class" configuration setting. However, this is highly
+    discouraged for production environments. The "v7" naming scheme will be
+    used for naming the auto generated classes. See "naming" in
+    DBIx::Class::Schema::Loader::Base for more information about naming.
 
-    You can, of course, use the dbicdump command-line utility provided by
-    DBIx::Class::Schema::Loader to ease the generation of your schema
-    classes.
+    For generating your own schema classes, you can use the dbicdump command
+    line tool provided by DBIx::Class::Schema::Loader to help you. For
+    example, if your app were named Foo, then you could run the following
+    from the root of your project directory:
+
+        dbicdump -o dump_directory=./lib Foo::Schema dbi:SQLite:/path/to/foo.db
+
+    For that example, your "schema_class" setting would be "Foo::Schema".
 
 AUTHORS
     *   Al Newkirk <awncorp@cpan.org>
 
-    *   Naveed Massjouni <naveed.massjouni@rackspace.com>
+    *   Naveed Massjouni <naveedm9@gmail.com>
 
     *   Alexis Sukrieh <sukria@sukria.net>
 

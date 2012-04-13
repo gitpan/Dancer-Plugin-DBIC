@@ -2,7 +2,7 @@
 abstract: 'DBIx::Class interface for Dancer applications'
 author:
   - 'Al Newkirk <awncorp@cpan.org>'
-  - 'Naveed Massjouni <naveed.massjouni@rackspace.com>'
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
   - 'Alexis Sukrieh <sukria@sukria.net>'
   - 'Franck Cuny <franck@lumberjaph.net>'
   - 'David Precious <davidp@preshweb.co.uk>'
@@ -23,4 +23,4 @@ requires:
 resources:
   bugtracker: https://github.com/ironcamel/Dancer-Plugin-DBIC/issues
   repository: git://github.com/ironcamel/Dancer-Plugin-DBIC.git
-version: 0.1505
+version: 0.1506

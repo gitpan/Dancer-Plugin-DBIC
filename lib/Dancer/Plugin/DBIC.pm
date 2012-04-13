@@ -1,8 +1,6 @@
-# ABSTRACT: DBIx::Class interface for Dancer applications
-
 package Dancer::Plugin::DBIC;
 
-our $VERSION = '0.1505'; # VERSION
+our $VERSION = '0.1506'; # VERSION
 
 use strict;
 use warnings;
@@ -11,7 +9,6 @@ use DBIx::Class;
 use DBIx::Class::Schema::Loader;
 DBIx::Class::Schema::Loader->naming('v7');
 
-
 my $schemas = {};
 
 register schema => sub {
@@ -19,7 +16,13 @@ register schema => sub {
     my $cfg = plugin_setting;
 
     if (not defined $name) {
-        ($name) = keys %$cfg or die "No schemas are configured";
+        if (keys %$cfg == 1) {
+            ($name) = keys %$cfg;
+        } elsif (keys %$cfg) {
+            $name = "default";
+        } else {
+            die "No schemas are configured";
+        }
     }
 
     return $schemas->{$name} if $schemas->{$name};
@@ -49,6 +52,9 @@ register schema => sub {
 
 register_plugin;
 
+# ABSTRACT: DBIx::Class interface for Dancer applications
+
+
 1;
 
 __END__
@@ -60,7 +66,7 @@ Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.1505
+version 0.1506
 
 =head1 SYNOPSIS
 
@@ -89,14 +95,14 @@ and are lazy loaded the first time they are accessed.
 =head1 CONFIGURATION
 
 Configuration can be done in your L<Dancer> config file.
-This is a minimal example:
+This is a minimal example. It defines one database named C<default>:
 
     plugins:
       DBIC:
         default:
           dsn: dbi:SQLite:dbname=some.db
 
-In this example, there are 2 databases configured named default and foo.
+In this example, there are 2 databases configured named C<default> and C<foo>:
 
     plugins:
       DBIC:
@@ -115,6 +121,10 @@ In this example, there are 2 databases configured named default and foo.
 Each database configured must have a dsn option.
 The dsn option should be the L<DBI> driver connection string.
 All other options are optional.
+
+If you only have one schema configured, or one of them is named
+C<default>, you can call C<schema> without an argument to get the only
+or C<default> schema, respectively.
 
 If a schema_class option is not provided, then L<DBIx::Class::Schema::Loader>
 will be used to dynamically load the schema based on the dsn value.
@@ -150,23 +160,36 @@ no arguments:
     my $user = schema->resultset('User')->find('bob');
 
 If you have configured multiple databases,
-then you must give C<schema()> the name of the database as an argument:
+you can still call C<schema> with no arguments if there is a database
+named C<default> in the configuration.
+Otherwise, you B<must> provide C<schema()> with the name of the database:
 
     my $user = schema('foo')->resultset('User')->find('bob');
 
 =head1 SCHEMA GENERATION
 
-This plugin provides flexibility in defining schemas for use in your Dancer 
-applications. Schemas can be generated manually by you and defined in your 
-configuration file using the C<schema_class> setting as illustrated above, which
-is the recommended approach for performance and stability.
+There are two approaches for generating schema classes.
+You may generate your own L<DBIx::Class> classes by hand and set
+the corresponding C<schema_class> setting in your configuration as shown above.
+This is the recommended approach for performance and stability.
 
 It is also possible to have schema classes automatically generated via
 introspection (powered by L<DBIx::Class::Schema::Loader>) if you omit the
-C<schema_class> directive; this is not encouraged for production use, however.
+C<schema_class> configuration setting.
+However, this is highly discouraged for production environments.
+The C<v7> naming scheme will be used for naming the auto generated classes.
+See L<DBIx::Class::Schema::Loader::Base/naming> for more information about
+naming.
 
-You can, of course, use the L<dbicdump> command-line utility provided by
-L<DBIx::Class::Schema::Loader> to ease the generation of your schema classes.
+For generating your own schema classes,
+you can use the L<dbicdump> command line tool provided by
+L<DBIx::Class::Schema::Loader> to help you.
+For example, if your app were named Foo, then you could run the following
+from the root of your project directory:
+
+    dbicdump -o dump_directory=./lib Foo::Schema dbi:SQLite:/path/to/foo.db
+
+For that example, your C<schema_class> setting would be C<Foo::Schema>.
 
 =head1 AUTHORS
 
@@ -178,7 +201,7 @@ Al Newkirk <awncorp@cpan.org>
 
 =item *
 
-Naveed Massjouni <naveed.massjouni@rackspace.com>
+Naveed Massjouni <naveedm9@gmail.com>
 
 =item *
 
