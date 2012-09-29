@@ -21,10 +21,10 @@ my %WriteMakefileArgs = (
   "NAME" => "Dancer::Plugin::DBIC",
   "PREREQ_PM" => {
     "DBIx::Class" => 0,
-    "DBIx::Class::Schema::Loader" => "0.07002",
-    "Dancer" => 0
+    "Dancer" => 0,
+    "Module::Load" => 0
   },
-  "VERSION" => "0.1506",
+  "VERSION" => "0.1600",
   "test" => {
     "TESTS" => "t/*.t"
   }

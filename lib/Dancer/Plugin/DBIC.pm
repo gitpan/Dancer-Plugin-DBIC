@@ -1,13 +1,12 @@
 package Dancer::Plugin::DBIC;
 
-our $VERSION = '0.1506'; # VERSION
+our $VERSION = '0.1600'; # VERSION
 
 use strict;
 use warnings;
 use Dancer::Plugin;
 use DBIx::Class;
-use DBIx::Class::Schema::Loader;
-DBIx::Class::Schema::Loader->naming('v7');
+use Module::Load;
 
 my $schemas = {};
 
@@ -33,17 +32,21 @@ register schema => sub {
         ? @{$options->{connect_info}}
         : @$options{qw(dsn user pass options)};
 
-    # pckg should be deprecated
+    warn "The pckg option is deprecated. Please use schema_class instead."
+        if $options->{pckg};
     my $schema_class = $options->{schema_class} || $options->{pckg};
 
     if ($schema_class) {
         $schema_class =~ s/-/::/g;
-        eval "use $schema_class";
-        if ( my $err = $@ ) {
-            die "error while loading $schema_class : $err";
-        }
+        eval { load $schema_class };
+        die "Could not load schema_class $schema_class" if $@;
         $schemas->{$name} = $schema_class->connect(@conn_info)
     } else {
+        my $dbic_loader = 'DBIx::Class::Schema::Loader';
+        eval { load $dbic_loader };
+        die "You must provide a schema_class option or install $dbic_loader."
+            if $@;
+        $dbic_loader->naming('v7');
         $schemas->{$name} = DBIx::Class::Schema::Loader->connect(@conn_info);
     }
 
@@ -66,7 +69,7 @@ Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.1506
+version 0.1600
 
 =head1 SYNOPSIS
 
