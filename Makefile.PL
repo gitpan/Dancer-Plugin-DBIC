@@ -10,7 +10,7 @@ use ExtUtils::MakeMaker 6.30;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "DBIx::Class interface for Dancer applications",
-  "AUTHOR" => "Al Newkirk <awncorp\@cpan.org>, Naveed Massjouni <naveedm9\@gmail.com>, Alexis Sukrieh <sukria\@sukria.net>, Franck Cuny <franck\@lumberjaph.net>, David Precious <davidp\@preshweb.co.uk>",
+  "AUTHOR" => "Al Newkirk <awncorp\@cpan.org>, Naveed Massjouni <naveedm9\@gmail.com>",
   "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30"
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Dancer" => 0,
     "Module::Load" => 0
   },
-  "VERSION" => "0.1601",
+  "VERSION" => "0.1700",
   "test" => {
     "TESTS" => "t/*.t"
   }
