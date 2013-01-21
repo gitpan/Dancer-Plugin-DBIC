@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Dancer" => 0,
     "Module::Load" => 0
   },
-  "VERSION" => "0.1800",
+  "VERSION" => "0.1801",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -2,7 +2,7 @@ NAME
     Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 VERSION
-    version 0.1800
+    version 0.1801
 
 SYNOPSIS
         use Dancer;
@@ -144,13 +144,17 @@ SCHEMA GENERATION
 CONTRIBUTORS
     *   Alexis Sukrieh <sukria@sukria.net>
 
-    *   Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
-
-    *   Franck Cuny <franck@lumberjaph.net>
+    *   Dagfinn Ilmari Mannsåker <<https://github.com/ilmari>>
 
     *   David Precious <davidp@preshweb.co.uk>
 
-    *   Steven Humphrey
+    *   Fabrice Gabolde <<https://github.com/fgabolde>>
+
+    *   Franck Cuny <franck@lumberjaph.net>
+
+    *   Steven Humphrey <<https://github.com/shumphrey>>
+
+    *   Yanick Champoux <<https://github.com/yanick>>
 
 AUTHORS
     *   Al Newkirk <awncorp@cpan.org>

@@ -1,6 +1,6 @@
 package Dancer::Plugin::DBIC;
 
-our $VERSION = '0.1800'; # VERSION
+our $VERSION = '0.1801'; # VERSION
 
 use strict;
 use warnings;
@@ -78,7 +78,7 @@ Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.1800
+version 0.1801
 
 =head1 SYNOPSIS
 
@@ -241,11 +241,7 @@ Alexis Sukrieh <sukria@sukria.net>
 
 =item *
 
-Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
-
-=item *
-
-Franck Cuny <franck@lumberjaph.net>
+Dagfinn Ilmari Mannsåker <L<https://github.com/ilmari>>
 
 =item *
 
@@ -253,7 +249,19 @@ David Precious <davidp@preshweb.co.uk>
 
 =item *
 
-Steven Humphrey
+Fabrice Gabolde <L<https://github.com/fgabolde>>
+
+=item *
+
+Franck Cuny <franck@lumberjaph.net>
+
+=item *
+
+Steven Humphrey <L<https://github.com/shumphrey>>
+
+=item *
+
+Yanick Champoux <L<https://github.com/yanick>>
 
 =back
 
