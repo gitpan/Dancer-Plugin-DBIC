@@ -17,9 +17,9 @@ recommends:
   DBIx::Class::Schema::Loader: 0.07002
 requires:
   DBIx::Class: 0
-  Dancer: 0
+  Dancer: 1.3098
   Module::Load: 0
 resources:
   bugtracker: https://github.com/ironcamel/Dancer-Plugin-DBIC/issues
   repository: git://github.com/ironcamel/Dancer-Plugin-DBIC.git
-version: 0.1801
+version: 0.1802

@@ -2,7 +2,7 @@ NAME
     Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 VERSION
-    version 0.1801
+    version 0.1802
 
 SYNOPSIS
         use Dancer;
