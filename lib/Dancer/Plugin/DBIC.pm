@@ -1,6 +1,6 @@
 package Dancer::Plugin::DBIC;
 
-our $VERSION = '0.1802'; # VERSION
+our $VERSION = '0.1803'; # VERSION
 
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ sub schema {
     if ($schema_class) {
         $schema_class =~ s/-/::/g;
         eval { load $schema_class };
-        die "Could not load schema_class $schema_class" if $@;
+        die "Could not load schema_class $schema_class: $@" if $@;
         $schemas->{$name} = $schema_class->connect(@conn_info)
     } else {
         my $dbic_loader = 'DBIx::Class::Schema::Loader';
@@ -78,7 +78,7 @@ Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.1802
+version 0.1803
 
 =head1 SYNOPSIS
 
