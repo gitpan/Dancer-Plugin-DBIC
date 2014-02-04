@@ -2,7 +2,7 @@ NAME
     Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 VERSION
-    version 0.1803
+    version 0.1900
 
 SYNOPSIS
         use Dancer;
@@ -47,13 +47,13 @@ CONFIGURATION
         plugins:
           DBIC:
             default:
-              dsn: dbi:SQLite:dbname=some.db
+              dsn: dbi:SQLite:dbname=myapp.db
               schema_class: MyApp::Schema
             foo:
-              dsn: dbi:mysql:foo
+              dsn: dbi:Pg:dbname=foo
               schema_class: Foo::Schema
               user: bob
-              pass: secret
+              password: secret
               options:
                 RaiseError: 1
                 PrintError: 1
@@ -74,22 +74,41 @@ CONFIGURATION
 
     The schema_class option, should be a proper Perl package name that
     Dancer::Plugin::DBIC will use as a DBIx::Class::Schema class.
-    Optionally, a database configuation may have user, pass, and options
+    Optionally, a database configuation may have user, password, and options
     parameters as described in the documentation for "connect()" in DBI.
 
-    You may also declare your connection information in the following format
-    (which may look more familiar to DBIC users):
+    Alternatively, you may also declare your connection information inside
+    an array named "connect_info":
 
         plugins:
           DBIC:
             default:
               connect_info:
-                - dbi:mysql:foo
+                - dbi:Pg:dbname=foo
                 - bob
                 - secret
                 -
                   RaiseError: 1
                   PrintError: 1
+
+    Schema aliases allow you to reference the same underlying database by
+    multiple names. For example:
+
+        plugins:
+          DBIC:
+            default:
+              dsn: dbi:Pg:dbname=master
+              schema_class: MyApp::Schema
+            slave1:
+              alias: default
+
+    Now you can access the default schema with "schema()",
+    "schema('default')", or "schema('slave1')". This can come in handy if,
+    for example, you have master/slave replication in your production
+    environment but only a single database in your development environment.
+    You can continue to reference "schema('slave1')" in your code in both
+    environments by simply creating a schema alias in your development.yml
+    config file, as shown above.
 
 FUNCTIONS
   schema
@@ -159,7 +178,7 @@ CONTRIBUTORS
 AUTHORS
     *   Al Newkirk <awncorp@cpan.org>
 
-    *   Naveed Massjouni <naveedm9@gmail.com>
+    *   Naveed Massjouni <naveed@vt.edu>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2010 by awncorp.

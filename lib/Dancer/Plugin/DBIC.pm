@@ -1,6 +1,6 @@
 package Dancer::Plugin::DBIC;
 
-our $VERSION = '0.1803'; # VERSION
+our $VERSION = '0.1900'; # VERSION
 
 use strict;
 use warnings;
@@ -27,10 +27,16 @@ sub schema {
     return $schemas->{$name} if $schemas->{$name};
 
     my $options = $cfg->{$name} or die "The schema $name is not configured";
+    if ( my $alias = $options->{alias} ) {
+        $options = $cfg->{$alias}
+            or die "The schema alias $alias does not exist in the config";
+        return $schemas->{$alias} if $schemas->{$alias};
+    }
 
     my @conn_info = $options->{connect_info}
         ? @{$options->{connect_info}}
         : @$options{qw(dsn user pass options)};
+    $conn_info[2] = $options->{password} if defined $options->{password};
 
     warn "The pckg option is deprecated. Please use schema_class instead."
         if $options->{pckg};
@@ -40,13 +46,13 @@ sub schema {
         $schema_class =~ s/-/::/g;
         eval { load $schema_class };
         die "Could not load schema_class $schema_class: $@" if $@;
-        $schemas->{$name} = $schema_class->connect(@conn_info)
+        $schemas->{$name} = $schema_class->connect(@conn_info);
     } else {
         my $dbic_loader = 'DBIx::Class::Schema::Loader';
         eval { load $dbic_loader };
         die "You must provide a schema_class option or install $dbic_loader."
             if $@;
-        $dbic_loader->naming('v7');
+        $dbic_loader->naming( $options->{schema_loader_naming} || 'v7' );
         $schemas->{$name} = DBIx::Class::Schema::Loader->connect(@conn_info);
     }
 
@@ -72,13 +78,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Dancer::Plugin::DBIC - DBIx::Class interface for Dancer applications
 
 =head1 VERSION
 
-version 0.1803
+version 0.1900
 
 =head1 SYNOPSIS
 
@@ -111,8 +119,6 @@ You just need to configure your database connection information.
 For performance, schema objects are cached in memory
 and are lazy loaded the first time they are accessed.
 
-=encoding utf8
-
 =head1 CONFIGURATION
 
 Configuration can be done in your L<Dancer> config file.
@@ -128,13 +134,13 @@ In this example, there are 2 databases configured named C<default> and C<foo>:
     plugins:
       DBIC:
         default:
-          dsn: dbi:SQLite:dbname=some.db
+          dsn: dbi:SQLite:dbname=myapp.db
           schema_class: MyApp::Schema
         foo:
-          dsn: dbi:mysql:foo
+          dsn: dbi:Pg:dbname=foo
           schema_class: Foo::Schema
           user: bob
-          pass: secret
+          password: secret
           options:
             RaiseError: 1
             PrintError: 1
@@ -155,22 +161,43 @@ advantage of that.
 
 The schema_class option, should be a proper Perl package name that
 Dancer::Plugin::DBIC will use as a L<DBIx::Class::Schema> class.
-Optionally, a database configuation may have user, pass, and options parameters
-as described in the documentation for C<connect()> in L<DBI>.
+Optionally, a database configuation may have user, password, and options
+parameters as described in the documentation for C<connect()> in L<DBI>.
 
-You may also declare your connection information in the following format
-(which may look more familiar to DBIC users):
+Alternatively, you may also declare your connection information inside an
+array named C<connect_info>:
 
     plugins:
       DBIC:
         default:
           connect_info:
-            - dbi:mysql:foo
+            - dbi:Pg:dbname=foo
             - bob
             - secret
             -
               RaiseError: 1
               PrintError: 1
+
+Schema aliases allow you to reference the same underlying database by multiple
+names.
+For example:
+
+    plugins:
+      DBIC:
+        default:
+          dsn: dbi:Pg:dbname=master
+          schema_class: MyApp::Schema
+        slave1:
+          alias: default
+
+Now you can access the default schema with C<schema()>, C<schema('default')>,
+or C<schema('slave1')>.
+This can come in handy if, for example, you have master/slave replication in
+your production environment but only a single database in your development
+environment.
+You can continue to reference C<schema('slave1')> in your code in both
+environments by simply creating a schema alias in your development.yml config
+file, as shown above.
 
 =head1 FUNCTIONS
 
@@ -275,7 +302,7 @@ Al Newkirk <awncorp@cpan.org>
 
 =item *
 
-Naveed Massjouni <naveedm9@gmail.com>
+Naveed Massjouni <naveed@vt.edu>
 
 =back
 
