@@ -36,10 +36,11 @@ requires:
   Dancer: 1.3098
   Dancer::Plugin: 0
   Module::Load: 0
+  SQL::Translator: 0.11016
   strict: 0
   utf8: 0
   warnings: 0
 resources:
   bugtracker: https://github.com/ironcamel/Dancer-Plugin-DBIC/issues
   repository: git://github.com/ironcamel/Dancer-Plugin-DBIC.git
-version: 0.1900
+version: 0.1901
