@@ -44,4 +44,4 @@ requires:
 resources:
   bugtracker: https://github.com/ironcamel/Dancer-Plugin-DBIC/issues
   repository: git://github.com/ironcamel/Dancer-Plugin-DBIC.git
-version: 0.2001
+version: 0.2100
